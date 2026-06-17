@@ -130,8 +130,31 @@
   .menu-toggle{ display:none; }
 
   @media (max-width:860px){
-    nav.primary .nav-link{ display:none; }
-    nav.primary .nav-cta{ display:none; }
+    nav.primary{
+      position:absolute;
+      top:100%;
+      left:0;
+      right:0;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:18px;
+      background:rgba(10,25,47,0.98);
+      border-bottom:1px solid rgba(255,255,255,0.10);
+      padding:24px 32px 28px;
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      visibility:hidden;
+      transition:max-height .25s ease, opacity .2s ease;
+    }
+    nav.primary.is-open{
+      max-height:400px;
+      opacity:1;
+      visibility:visible;
+    }
+    nav.primary .nav-link{ display:block; font-size:16px; }
+    nav.primary .nav-cta{ display:inline-flex; margin-top:4px; }
+    header.site .bar{ position:relative; }
     .menu-toggle{
       display:inline-flex;
       background:transparent;
@@ -143,6 +166,7 @@
       font-family:var(--font-body);
       cursor:pointer;
     }
+    .menu-toggle:hover{ border-color:rgba(255,255,255,0.5); }
   }
 
   /* ---------- Hero ---------- */
@@ -849,13 +873,13 @@
 <header class="site">
   <div class="bar">
     <a href="#top" class="logo"><img src="assets/logo.png" alt="Apex Staffing and Advisory logo" class="logo-mark" />Apex <span>Staffing &amp; Advisory</span></a>
-    <nav class="primary">
+    <nav class="primary" id="primaryNav">
       <a class="nav-link" href="#services">Services</a>
       <a class="nav-link" href="#results">Results</a>
       <a class="nav-link" href="#inflection">Insights</a>
       <a class="nav-cta" href="#contact">Schedule a Briefing</a>
     </nav>
-    <button class="menu-toggle" aria-label="Open menu">Menu</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="primaryNav">Menu</button>
   </div>
 </header>
 
@@ -1122,5 +1146,39 @@
   <a class="btn btn-primary" href="#contact">Schedule a Briefing</a>
 </div>
 
+  <script>
+    (function () {
+      var toggle = document.getElementById('menuToggle');
+      var nav = document.getElementById('primaryNav');
+      if (!toggle || !nav) return;
+
+      function closeMenu() {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = 'Menu';
+      }
+
+      function openMenu() {
+        nav.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.textContent = 'Close';
+      }
+
+      toggle.addEventListener('click', function () {
+        var isOpen = nav.classList.contains('is-open');
+        if (isOpen) { closeMenu(); } else { openMenu(); }
+      });
+
+      // Close the menu after tapping any link inside it
+      nav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+      });
+
+      // Reset menu state if the viewport grows back to desktop width
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 860) { closeMenu(); }
+      });
+    })();
+  </script>
 </body>
 </html>
